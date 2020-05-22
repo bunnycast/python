@@ -1,31 +1,42 @@
-# # H, M = map(int, input().split())
-# # if (M - 45) >= 0:
-# #   print(H, M - 45)
-# # else:
-# #   if (H - 1) < 0:
-# #     print(H + 23, M + 15)
-# #   else: 
-# #     print(H - 1, M + 15)
+import math 
+class Complex(object):
+    def __init__(self, real, imaginary):
+        self._real = real
+        self._imaginary = imaginary
+    def __add__(self, no):
+        return Complex(self._real + no._real, self._imaginary + no._imaginary)
+  
+    def __sub__(self, no):
+        return Complex(self._real - no._real, self._imaginary - no._imaginary)
+        
+    def __mul__(self, no):
+        return Complex(self._real * no._real - self._imaginary * no._imaginary, self._real * no._real + self._imaginary * no._imaginary)
 
-# from datetime import datetime, date, time
+    def __truediv__(self, no):
+        real_div = (self._real * no._real + self._imaginary * no._imaginary) / (no._real ** 2 + no._imaginary ** 2) 
+        imag_div = (self._imaginary * no._real + self._real * no._imaginary) / (no._real ** 2 + no._imaginary ** 2) 
+        return Complex(real_div, imag_div)
+    
+    def mod(self):
+        return Complex(math.sqrt(self._real ** 2 + self._imaginary ** 2),0)
 
-# def days_a_week(self):
-#   week = ['월', '화', '수', '목', '금', '토', '일']
-#   day = week[fool_day.weekday()]
-#   return day + '요일'
+    def __str__(self):
+        if self._imaginary == 0:
+            result = "%.2f+0.00i" % (self._real)
+        elif self._real == 0:
+            if self._imaginary >= 0:
+                result = "0.00+%.2fi" % (self._imaginary)
+            else:
+                result = "0.00-%.2fi" % (abs(self._imaginary))
+        elif self._imaginary > 0:
+            result = "%.2f+%.2fi" % (self._real, self._imaginary)
+        else:
+            result = "%.2f-%.2fi" % (self._real, abs(self._imaginary))
+        return result
 
-
-# fool_day = date(  2020, 4, 1)
-# print(fool_day.year, fool_day.month, fool_day.day, days_a_week(fool_day.weekday()))
-
-# now = datetime.now()
-# print(now.hour,':',now.minute,':', now.second)
-a = 2.0 + 1.0j
-b = 5.0 + 6.0j
-
-print(a + b)
-print(a - b)
-print(a * b)
-print(a / b)
-# print(mod(a))
-# print(mod(b))
+if __name__ == '__main__':
+    c = map(float, input().split())
+    d = map(float, input().split())
+    x = Complex(*c)
+    y = Complex(*d)
+    print(*map(str, [x+y, x-y, x*y, x/y, x.mod(), y.mod()]), sep='\n')
