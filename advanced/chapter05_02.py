@@ -210,4 +210,4 @@ cm = CraneMachine(range(1, 100)) # 추상 메소드 구현 안하면 에러
 print('EX5-4', cm._items)
 print('EX5-5', cm.pick())
 print('EX5-6', cm())
-print('EX5-6', cm.inspect())
+print('EX5-7', cm.inspect())
