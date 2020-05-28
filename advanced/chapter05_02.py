@@ -84,8 +84,8 @@ def repeat_outer(obj): # closure
         del obj.a
     return repeat_inner
 
-print(min(timeit.repeat(repeat_outer(use_slot), number = 500000))) 
-print(min(timeit.repeat(repeat_outer(no_slot), number = 500000)))
+print(min(timeit.repeat(repeat_outer(use_slot), number = 50))) 
+print(min(timeit.repeat(repeat_outer(no_slot), number = 50)))
 
 print()
 
@@ -101,3 +101,113 @@ class Objects:
 s = Objects()
 
 print('EX3-1', s.__dict__)
+print('EX3-2', len(s))
+print('EX3-3', len(s._numbers))
+print('EX3-4', s[1:100])
+print('EX3-5', s[-1])
+print('EX3-6', s[::10])
+
+print()
+
+
+# 파이썬 추상 클래스
+# 참고 : https://docs.python.org/ko/3/library/collections.abc.html
+
+# 자체적으로 객체 생성 불가
+# 상속을 통해서 자식 클래스에서 인스턴스를 생성해야 함
+# 개발과 관련된 공통된 내용(필드, 메소드) 추출 및 통합해서 공통된 내용으로 작성하게 하는 것
+
+# Sequence 상속받지 않았지만, 자동으로 __iter__, __contain__기능 작동
+# 객체 전체를 자동으로 조사 -> 시퀀스 프로토콜
+
+class IterTestA():
+    def __getitem__(self, idx):
+        return range(1, 50, 2)[idx] # range(1, 50, 2)
+
+i1 = IterTestA()
+
+print('EX4-1', i1[4])
+print('EX4-2', i1[4:10])
+print('EX4-3', 3 in i1[1:10])
+# print('EX4-4', [i for i in i1])
+
+print()
+
+
+# Sequence 상속
+# 요구사항인 추상메소드를 모두 구현해야 동작
+
+from collections.abc import Sequence
+
+class IterTestB(Sequence):
+    def __getitem__(self, idx):
+        return range(1, 50, 2)[idx] # range(1, 50, 2)
+
+    def __len__(self, idx):
+        return len(range(1, 50, 2)[idx])
+
+i2 = IterTestB()
+
+print('EX4-5', i2[4])
+print('EX4-6', i2[4:10])
+print('EX4-7', 3 in i2[1:10])
+
+
+# abc 활용 예제
+import abc
+
+class RandomMachine(abc.ABC): # python 3.4 이하는 metaclass = abc.ABCMeta
+    # __metaclass__ = abc.ABCMeta
+
+    # 추상메소드 
+    @abc.abstractmethod
+    def load(self, iterobj):
+        '''Iterable 항목 추가 '''
+    
+    # 추상메소드
+    @abc.abstractmethod
+    def pick(self, iterobj):
+        '''무작위항목 뽑기'''
+
+    def inspect(self):
+        items = []
+        while True:
+            try:
+                items.append(self.pick())
+            except LookupError:
+                break
+            return tuple(sorted(items))
+
+import random
+class CraneMachine(RandomMachine):
+    def __init__(self, items):
+        self._randomizer = random.SystemRandom()
+        self._items = []
+        self.load(items)
+    
+    def load(self, items):
+        self._items.extend(items)
+        self._randomizer.shuffle(self._items)
+    
+    def pick(self):
+        try:
+            return self._items.pop()
+        except IndexError:
+            raise LookupError('Empty Crane Box')
+    
+    def __call__(self):
+        return self.pick()
+
+# 서브클래스 확인
+print('EX5-1', issubclass(RandomMachine, CraneMachine))
+print('EX5-2', issubclass(CraneMachine, RandomMachine))
+
+# 상속 구조 확인
+print('EX5-3', CraneMachine.__mro__)
+
+cm = CraneMachine(range(1, 100)) # 추상 메소드 구현 안하면 에러
+
+print('EX5-4', cm._items)
+print('EX5-5', cm.pick())
+print('EX5-6', cm())
+print('EX5-6', cm.inspect())
